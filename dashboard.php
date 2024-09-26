@@ -1,9 +1,6 @@
-<?php 
-// Start the session
+<?php
+// Start the session to check if the user is logged in
 session_start();
-
-// Include the database connection file
-include 'DBconnect.php';
 
 // Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION['customer_id'])) {
@@ -11,43 +8,32 @@ if (!isset($_SESSION['customer_id'])) {
     exit();
 }
 
-// Fetch the exercise ID from session or any other relevant source
-$exercise_id = $_SESSION['exercise_id']; // Adjust this to correctly fetch the Exercise_ID as per your application logic
-
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve the form input values
-    $calories_burned = $_POST['calories_burned'];
-    $total_reps = $_POST['total_reps'];
-    $distance = $_POST['distance'];
-    $exer_duration = $_POST['exercise_duration']; // Changed to match the form field name
-
-    // Validate that all fields are filled
-    if (!empty($calories_burned) && !empty($total_reps) && !empty($distance) && !empty($exer_duration)) {
-        // Prepare the SQL query to update the progress metrics using Exercise_ID
-        $updateQuery = "UPDATE `exercise information` SET `Calories_Burned` = ?, `Total_Reps` = ?, `Distance` = ?, `Exer_Duration` = ? WHERE `Exercise_ID` = ?";
-        $stmt = $connection->prepare($updateQuery);
-        if ($stmt) {
-            // Bind the parameters to the SQL query
-            $stmt->bind_param("iiisi", $calories_burned, $total_reps, $distance, $exer_duration, $exercise_id);
-            // Execute the query
-            if ($stmt->execute()) {
-                echo "Progress updated successfully.";
-                // Redirect to the dashboard after successful update
-                header("Location: dashboard.php");
-                exit();
-            } else {
-                echo "Error updating progress: " . $stmt->error;
-            }
-            // Close the statement
-            $stmt->close();
-        } else {
-            echo "Error preparing query: " . $connection->error;
-        }
-    } else {
-        echo "Please fill out all fields in the form.";
-    }
+// Check if the exercise_id is set in the session
+if (!isset($_SESSION['exercise_id'])) {
+    $_SESSION['exercise_id'] = null; // Set to null or handle it as per your application needs
 }
+
+// Include the database connection file
+include 'DBconnect.php';
+
+// Get the logged-in customer's ID and Exercise_ID from the session
+$customer_id = $_SESSION['customer_id'];
+$exercise_id = $_SESSION['exercise_id'];
+
+// Fetch user info from the customer information table
+$customerQuery = "SELECT * FROM `customer information` WHERE `Customer ID` = '$customer_id'";
+$customerResult = $connection->query($customerQuery);
+$customer = $customerResult->fetch_assoc();
+
+// Fetch trainer info based on the selected trainer
+$trainerName = $customer['Trainer Name']; // Assuming trainer name is stored directly in customer info
+$trainerQuery = "SELECT * FROM `trainer information` WHERE `Name` = '$trainerName'";
+$trainerResult = $connection->query($trainerQuery);
+$trainer = $trainerResult->fetch_assoc();
+
+// Fetch progress metrics for the customer using Exercise_ID
+$progressQuery = "SELECT * FROM `exercise information` WHERE `Exercise_ID` = '$exercise_id'";
+$progressResult = $connection->query($progressQuery);
 
 // Close the connection
 $connection->close();
@@ -57,87 +43,81 @@ $connection->close();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Update Progress</title>
+    <title>User Dashboard</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .form-container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
-        }
-
-        .form-container h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .form-container label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            text-align: left;
-        }
-
-        .form-container input[type="number"],
-        .form-container button {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .form-container input[type="number"]:focus {
-            border-color: #7a9cff;
-            outline: none;
-        }
-
-        .form-container button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .form-container button:hover {
-            background-color: #45a049;
-        }
+        body { font-family: Arial, sans-serif; }
+        .section { margin-bottom: 20px; }
+        .section h2 { border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        table, th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f4f4f4; }
+        .button-container { margin-top: 20px; }
+        button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>Update Your Progress Metrics</h2>
-    <form action="update_exercise.php" method="post">
-        <label for="calories_burned">Calories Burned:</label>
-        <input type="number" id="calories_burned" name="calories_burned" required>
+<h1>Welcome, <?php echo htmlspecialchars($customer['Name']); ?>!</h1>
 
-        <label for="total_reps">Total Reps:</label>
-        <input type="number" id="total_reps" name="total_reps" required>
+<div class="section">
+    <h2>Your Information</h2>
+    <p><strong>Email:</strong> <?php echo htmlspecialchars($customer['Email']); ?></p>
+    <p><strong>Age:</strong> <?php echo htmlspecialchars($customer['Age']); ?></p>
+    <p><strong>Height:</strong> <?php echo htmlspecialchars($customer['Height']); ?> cm</p>
+    <p><strong>Weight:</strong> <?php echo htmlspecialchars($customer['Weight']); ?> kg</p>
+    <p><strong>BMI:</strong> <?php echo htmlspecialchars($customer['BMI']); ?></p>
+</div>
 
-        <label for="distance">Distance (m):</label>
-        <input type="number" id="distance" name="distance" required>
+<?php if ($trainer): ?>
+    <div class="section">
+        <h2>Your Trainer: <?php echo htmlspecialchars($trainer['Name']); ?></h2>
+        <p><strong>Workout Plan:</strong> <?php echo htmlspecialchars($trainer['Workout_Plan']); ?></p>
+    </div>
+<?php endif; ?>
 
-        <label for="exercise_duration">Exercise Duration (min):</label>
-        <input type="number" id="exercise_duration" name="exercise_duration" required>
+<div class="section">
+    <h2>Your Progress Metrics</h2>
+    <?php if ($progressResult && $progressResult->num_rows > 0): ?>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Calories Burned</th>
+                <th>Total Reps</th>
+                <th>Distance (m)</th>
+                <th>Exercise Duration (min)</th>
+            </tr>
+            <?php while ($progress = $progressResult->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($progress['Date']); ?></td>
+                    <td><?php echo htmlspecialchars($progress['Calories_Burned']); ?></td>
+                    <td><?php echo htmlspecialchars($progress['Total_Reps']); ?></td>
+                    <td><?php echo htmlspecialchars($progress['Distance']); ?></td>
+                    <td><?php echo htmlspecialchars($progress['Exer_Duration']); ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    <?php else: ?>
+        <p>No progress metrics found.</p>
+    <?php endif; ?>
+    <!-- Update Progress Button -->
+    <div class="button-container">
+        <a href="update_exercise.php"><button>Update Your Progress</button></a>
+    </div>
+</div>
 
-        <button type="submit">Submit</button>
+<!-- Feedback Button Section -->
+<div class="section">
+    <h2>Trainer Feedback</h2>
+    <p>We value your feedback. Please let us know about your experience with your trainer.</p>
+    <form action="insert_feedback.php" method="post">
+        <button type="submit" class="btn btn-primary">Give Feedback on Trainer</button>
     </form>
+</div>
+
+<!-- Insert Exercise Button -->
+<div class="button-container">
+    <a href="insert_exercise.php"><button>Insert Exercise</button></a>
 </div>
 
 </body>
