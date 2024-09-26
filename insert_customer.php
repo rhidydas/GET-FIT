@@ -91,33 +91,91 @@ $connection->close();
 <head>
     <meta charset="UTF-8">
     <title>Insert New Customer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <h2>Insert New Customer</h2>
     <form method="post" action="">
         <label for="name">Name:</label>
-        <input type="text" name="name" id="name" required><br><br>
+        <input type="text" name="name" id="name" required><br>
 
         <label for="age">Age:</label>
-        <input type="number" name="age" id="age" required><br><br>
+        <input type="number" name="age" id="age" required><br>
 
         <label for="height">Height (cm):</label>
-        <input type="number" name="height" id="height" required><br><br>
+        <input type="number" name="height" id="height" required><br>
 
         <label for="weight">Weight (kg):</label>
-        <input type="number" name="weight" id="weight" required><br><br>
+        <input type="number" name="weight" id="weight" required><br>
 
         <label for="bmi">BMI:</label>
-        <input type="number" step="0.1" name="bmi" id="bmi" required><br><br>
+        <input type="number" step="0.1" name="bmi" id="bmi" required><br>
 
         <label for="gender">Gender:</label>
-        <input type="text" name="gender" id="gender" required><br><br>
+        <input type="text" name="gender" id="gender" required><br>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required><br><br>
+        <input type="email" name="email" id="email" required><br>
 
         <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required><br><br>
+        <input type="password" name="password" id="password" required><br>
 
         <input type="submit" value="Submit">
     </form>
