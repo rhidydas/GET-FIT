@@ -10,14 +10,13 @@ if (!isset($_SESSION['customer_id'])) {
 
 // Check if the exercise_id is set in the session
 if (!isset($_SESSION['exercise_id'])) {
-    // Handle the case where exercise_id is not set
     $_SESSION['exercise_id'] = null; // Set to null or handle it as per your application needs
 }
 
 // Include the database connection file
 include 'DBconnect.php';
 
-// Get the logged-in customer's ID from the session
+// Get the logged-in customer's ID and Exercise_ID from the session
 $customer_id = $_SESSION['customer_id'];
 $exercise_id = $_SESSION['exercise_id'];
 
@@ -32,8 +31,8 @@ $trainerQuery = "SELECT * FROM `trainer information` WHERE `Name` = '$trainerNam
 $trainerResult = $connection->query($trainerQuery);
 $trainer = $trainerResult->fetch_assoc();
 
-// Fetch progress metrics for the customer
-$progressQuery = "SELECT * FROM `progress information` WHERE `Customer_ID` = '$customer_id'";
+// Fetch progress metrics for the customer using Exercise_ID
+$progressQuery = "SELECT * FROM `exercise information` WHERE `Exercise_ID` = '$exercise_id'";
 $progressResult = $connection->query($progressQuery);
 
 // Close the connection
