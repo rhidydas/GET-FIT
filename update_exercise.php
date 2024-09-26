@@ -1,4 +1,4 @@
-<?php
+<?php 
 // Start the session
 session_start();
 
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $calories_burned = $_POST['calories_burned'];
     $total_reps = $_POST['total_reps'];
     $distance = $_POST['distance'];
-    $exer_duration = $_POST['exer_duration'];
+    $exer_duration = $_POST['exercise_duration']; // Changed to match the form field name
 
     // Validate that all fields are filled
     if (!empty($calories_burned) && !empty($total_reps) && !empty($distance) && !empty($exer_duration)) {
@@ -33,6 +33,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Execute the query
             if ($stmt->execute()) {
                 echo "Progress updated successfully.";
+                // Redirect to the dashboard after successful update
+                header("Location: dashboard.php");
+                exit();
             } else {
                 echo "Error updating progress: " . $stmt->error;
             }
@@ -50,31 +53,92 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $connection->close();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Update Progress</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            text-align: left;
+        }
+
+        .form-container input[type="number"],
+        .form-container button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-container input[type="number"]:focus {
+            border-color: #7a9cff;
+            outline: none;
+        }
+
+        .form-container button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Update Your Progress Metrics</h2>
-<form action="update_exercise.php" method="post">
-    <label for="calories_burned">Calories Burned:</label>
-    <input type="number" id="calories_burned" name="calories_burned" required><br>
+<div class="form-container">
+    <h2>Update Your Progress Metrics</h2>
+    <form action="update_exercise.php" method="post">
+        <label for="calories_burned">Calories Burned:</label>
+        <input type="number" id="calories_burned" name="calories_burned" required>
 
-    <label for="total_reps">Total Reps:</label>
-    <input type="number" id="total_reps" name="total_reps" required><br>
+        <label for="total_reps">Total Reps:</label>
+        <input type="number" id="total_reps" name="total_reps" required>
 
-    <label for="distance">Distance (m):</label>
-    <input type="number" id="distance" name="distance" required><br>
+        <label for="distance">Distance (m):</label>
+        <input type="number" id="distance" name="distance" required>
 
-    <label for="exercise_duration">Exercise Duration (min):</label>
-    <input type="number" id="exercise_duration" name="exercise_duration" required><br>
+        <label for="exercise_duration">Exercise Duration (min):</label>
+        <input type="number" id="exercise_duration" name="exercise_duration" required>
 
-    <button type="submit">Submit</button>
-</form>
+        <button type="submit">Submit</button>
+    </form>
+</div>
 
 </body>
 </html>
