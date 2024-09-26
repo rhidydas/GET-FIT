@@ -1,3 +1,4 @@
+
 <?php
 // Database connection
 $servername = "localhost";
@@ -12,5 +13,5 @@ $connection = new mysqli($servername, $username, $password, $dbname);
 if ($connection->connect_error) {
     die("Connection failed: " . $connection->connect_error);
 }
-echo "Connection Established to the database: " . $dbname;
 ?>
+
